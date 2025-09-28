@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .current-config {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .preview {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+        }
+
+        .preview img {
+            max-width: 300px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 YouTube Video Configuration</h1>
+
+        <div class="current-config">
+            <h3>Current Configuration:</h3>
+            <p><strong>Title:</strong> {{ config.video_title }}</p>
+            <p><strong>URL:</strong> <a href="{{ config.youtube_url }}" target="_blank">{{ config.youtube_url }}</a></p>
+        </div>
+
+        <form id="updateForm">
+            <div class="form-group">
+                <label for="youtube_url">YouTube Video URL:</label>
+                <input type="url" id="youtube_url" value="{{ config.youtube_url }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="video_title">Video Title:</label>
+                <input type="text" id="video_title" value="{{ config.video_title }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="video_description">Video Description:</label>
+                <textarea id="video_description" rows="3" required>{{ config.video_description }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="video_thumbnail">Thumbnail URL:</label>
+                <input type="url" id="video_thumbnail" value="{{ config.video_thumbnail }}" required>
+            </div>
+
+            <button type="submit" class="btn">📱 Update Video Configuration</button>
+        </form>
+
+        <div id="status"></div>
+
+        <div class="preview">
+            <h3>Preview:</h3>
+            <div id="previewContent">
+                <img src="{{ config.video_thumbnail }}" alt="Thumbnail">
+                <p><strong>{{ config.video_title }}</strong></p>
+                <p>{{ config.video_description }}</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('updateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = {
+                youtube_url: document.getElementById('youtube_url').value,
+                video_title: document.getElementById('video_title').value,
+                video_description: document.getElementById('video_description').value,
+                video_thumbnail: document.getElementById('video_thumbnail').value
+            };
+
+            fetch('/update_video', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showStatus(data.message, 'success');
+                    updatePreview(formData);
+                } else {
+                    showStatus(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                showStatus('Network error occurred', 'error');
+            });
+        });
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = message;
+            statusDiv.className = 'status ' + type;
+        }
+
+        function updatePreview(data) {
+            document.getElementById('previewContent').innerHTML = `
+                <img src="${data.video_thumbnail}" alt="Thumbnail">
+                <p><strong>${data.video_title}</strong></p>
+                <p>${data.video_description}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
