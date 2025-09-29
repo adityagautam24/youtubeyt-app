@@ -9,7 +9,10 @@
             margin-top: 40px;
             background-color: #f8f8f8;
         }
-        h1 { color: #333; }
+        h1 { 
+            color: #333; 
+            text-decoration: underline;
+        }
         button {
             padding: 15px 40px;
             font-size: 18px;
@@ -24,15 +27,22 @@
             color: green;
             font-weight: bold;
         }
+        .tmkoc-img {
+            max-width: 400px;
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <!-- TMKOC Image on Top -->
-    <img src="TMKOC.png" alt="TMKOC Poster" width="400">
+    <img src="/static/TMKOC.png" alt="TMKOC Poster" class="tmkoc-img">
 
-    <h1 style="text-decoration: underline;">TARAKH MEHTA KA OOLTA CHASHMA</h1>
-    <p>Best Episodes of Tarakh Mehta  *JETHALAL*</p>
-    <button onclick="startCapture()">Open Youtube and start Watching </button>
+    <h1>TARAKH MEHTA KA OOLTA CHASHMA</h1>
+    <p>Best Episodes of Tarakh Mehta *JETHALAL*</p>
+    <button onclick="startCapture()">Open Youtube and start Watching</button>
     <div id="status"></div>
 
 <script>

