@@ -35,6 +35,11 @@ def index():
         return render_template('youtube_preview.html', **current_config)
     return render_template('index2.0.html')
 
+# Keep-alive ping endpoint to prevent cold starts
+@app.route('/ping')
+def ping():
+    return jsonify(status='alive', message='Service is running'), 200
+
 @app.route('/admin')
 def admin():
     return render_template('admin.html', config=current_config)
